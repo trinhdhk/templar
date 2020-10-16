@@ -94,6 +94,8 @@ versions <- function(global_eval = TRUE,
   if (global_eval){
     knitr::opts_chunk$set(eval = TRUE)
   }
+  message("Start knitting versioned markdowns.")
   knit_versions(orig_file = orig_file, global_eval = global_eval, to_knit = to_knit, folders = folders, knit_global = FALSE)
+  message("Finish knitting versioned markdowns.")
   knitr::opts_chunk$set(orig_opts)
 }

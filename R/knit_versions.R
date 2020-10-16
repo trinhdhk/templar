@@ -18,10 +18,30 @@ knit_versions <- function(orig_file,
                           global_eval = TRUE,
                           to_knit = NULL,
                           folders = NULL,
-                          knit_global = TRUE){
+                          knit_global = TRUE,
+                          .interactive = identical(Sys.getenv("RSTUDIO"), "1"),
+                          .ncores = floor(parallel::detectCores()/2)){
   orig_dir  <- dirname(orig_file)
   orig_name <- basename(orig_file)
-  orig_text <- readLines(orig_file) %>% prep_orig_text(global_eval)
+
+  orig_text <- readLines(orig_file)
+  has_call <- length(orig_text %>% stringr::str_which("versions\\("))
+  orig_text <- prep_orig_text(orig_text, global_eval)
+
+  if (knit_global){
+    if (has_call)
+      message("Found ", crayon::green('versions()'), " call within markdown file, pass to `rmarkdown::render`...")
+    if (.interactive){
+      if (has_call) {
+        rmarkdown::render(orig_file, encoding = "UTF-8")
+        return(invisible(TRUE))
+      }
+    } else{
+      message("- Knitting global file.")
+      rmarkdown::render(orig_file, encoding = "UTF-8")
+      if (has_call) return(invisible(TRUE))
+    }
+  }
 
   # Pull out chunk label info pertaining to versions
 
@@ -45,13 +65,9 @@ knit_versions <- function(orig_file,
   # In case we only want to knit a few of the versions
 
   if (length(to_knit)) {
-
     all_info <- all_info[, c(not_versions, to_knit)]
-
   } else {
-
     to_knit <- setdiff(names(all_info), not_versions)
-
   }
 
   # Handles the absence of solution code chunks
@@ -74,6 +90,17 @@ knit_versions <- function(orig_file,
 
   # Write and knit file for each version
 
-  purrr::map(to_knit, write_version, orig_name, orig_dir, orig_text, sec_info, all_info, folders)
-  if (knit_global) rmarkdown::render(orig_file)
+  if (.ncores > 1 && !.interactive){
+    fn_map <- furrr::future_map
+    future::plan(future::multiprocess, workers = .ncores)
+    message("- Knitting versioned files.")
+  } else {
+    fn_map <- purrr::map
+  }
+
+  fn_map(to_knit, write_version,
+         orig_name, orig_dir, orig_text, sec_info, all_info, folders, .interactive)
+
+  cat(crayon::green("Finished.\n"))
+  invisible(TRUE)
 }

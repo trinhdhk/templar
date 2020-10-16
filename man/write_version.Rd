@@ -4,7 +4,16 @@
 \alias{write_version}
 \title{Function to write the different versions.}
 \usage{
-write_version(v, orig_name, orig_dir, orig_text, sec_info, all_info, folders)
+write_version(
+  v,
+  orig_name,
+  orig_dir,
+  orig_text,
+  sec_info,
+  all_info,
+  folders,
+  .interactive = identical(Sys.getenv("RSTUDIO"), "1")
+)
 }
 \arguments{
 \item{v}{Version list}

@@ -9,7 +9,9 @@ knit_versions(
   global_eval = TRUE,
   to_knit = NULL,
   folders = NULL,
-  knit_global = TRUE
+  knit_global = TRUE,
+  .interactive = identical(Sys.getenv("RSTUDIO"), "1"),
+  .ncores = floor(parallel::detectCores()/2)
 )
 }
 \arguments{
