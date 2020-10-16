@@ -13,11 +13,11 @@ get_new_name <- function(v, orig_name, orig_dir, folders){
 
   if (is.null(folders[[v]])) folders[[v]] <- v
 
-  fol_name <- paste0(orig_dir, folders[[v]], "/")
+  fol_name <- file.path(orig_dir, folders[[v]])
 
   if (!dir.exists(fol_name)) { dir.create(fol_name) }
 
-  new_name <- paste0(fol_name, new_name)
+  new_name <- file.path(fol_name, new_name)
 
   return(new_name)
 }

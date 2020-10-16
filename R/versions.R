@@ -89,8 +89,10 @@ versions <- function(global_eval = TRUE,
   }
 
   orig_file <- knitr::current_input(dir = TRUE)
-  orig_dir <- orig_file %>% stringr::str_remove("[^\\/]*\\.Rmd")
-  orig_name <- orig_file %>% stringr::str_extract("[^\\/]*\\.Rmd")
+  orig_dir  <- dirname(orig_file)
+  orig_name <- basename(orig_file)
+  # orig_dir <- orig_file %>% stringr::str_remove("[^\\/]*\\.Rmd")
+  # orig_name <- orig_file %>% stringr::str_extract("[^\\/]*\\.Rmd")
 
   orig_text <- readLines(orig_file)
 
@@ -110,7 +112,7 @@ versions <- function(global_eval = TRUE,
 
   # This condition is to support when people don't submit %%% sections
 
-  if (!is.null(sec_info)){
+  if (length(sec_info)){
     all_info <- dplyr::full_join(chunk_info, sec_info) %>%
       dplyr::mutate_all(~tidyr::replace_na(.,FALSE))
   } else {
@@ -123,7 +125,7 @@ versions <- function(global_eval = TRUE,
 
   # In case we only want to knit a few of the versions
 
-  if (!is.null(to_knit)) {
+  if (length(to_knit)) {
 
     all_info <- all_info[, c(not_versions, to_knit)]
 
@@ -144,7 +146,10 @@ versions <- function(global_eval = TRUE,
   all_info <- purrr::map_df(to_knit, get_solution_chunks, all_info)
 
   all_info <- all_info %>%
-    dplyr::select(-"solution")
+    dplyr::select(-"solution") %>%
+    dplyr::group_by(starts, ends) %>%
+    dplyr::summarise_all(any) %>%
+    dplyr::ungroup()
 
   to_knit <- setdiff(names(all_info), not_versions)
 

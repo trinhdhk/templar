@@ -8,6 +8,7 @@
 get_solution_chunks <- function(version_chunk, all_info){
   sol_name <- glue::glue("solution_{version_chunk}")
 
+  # browser()
   if (is.null(all_info[[sol_name]])) {
     all_info[[sol_name]] <- FALSE
   }

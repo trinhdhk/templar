@@ -12,7 +12,6 @@
 
 write_version <- function(v, orig_name, orig_dir, orig_text, sec_info, all_info, folders){
   options(knitr.duplicate.label = 'allow')
-
   new_name <- get_new_name(v, orig_name, orig_dir, folders)
 
   temp <- version_cleaner(v, orig_text, sec_info, all_info, orig_dir)
