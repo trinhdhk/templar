@@ -14,9 +14,9 @@ get_solution_chunks <- function(version_chunk, all_info){
   }
 
   all_info[[sol_name]] <-
-    all_info[[version_chunk]] |
-    all_info[["solution"]] |
-    all_info[[sol_name]]
+    (all_info[[version_chunk]] %in% TRUE) |
+    (all_info[["solution"]] %in% TRUE) |
+    (all_info[[sol_name]] %in% TRUE)
 
   return(all_info)
 }

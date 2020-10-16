@@ -144,10 +144,9 @@ versions <- function(global_eval = TRUE,
   all_info <- purrr::map_df(to_knit, get_solution_chunks, all_info)
 
   all_info <- all_info %>%
-    dplyr::select(-"solution") %>%
+    dplyr::select(-solution) %>%
     dplyr::group_by(starts, ends) %>%
-    dplyr::summarise_all(any) %>%
-    dplyr::ungroup()
+    dplyr::summarise(dplyr::across(.fns = any, na.rm = TRUE), .groups = "drop")
 
   to_knit <- setdiff(names(all_info), not_versions)
   if (length(folders) & !is.list(folders))
