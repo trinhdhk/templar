@@ -91,8 +91,6 @@ versions <- function(global_eval = TRUE,
   orig_file <- knitr::current_input(dir = TRUE)
   orig_dir  <- dirname(orig_file)
   orig_name <- basename(orig_file)
-  # orig_dir <- orig_file %>% stringr::str_remove("[^\\/]*\\.Rmd")
-  # orig_name <- orig_file %>% stringr::str_extract("[^\\/]*\\.Rmd")
 
   orig_text <- readLines(orig_file)
 
@@ -152,6 +150,8 @@ versions <- function(global_eval = TRUE,
     dplyr::ungroup()
 
   to_knit <- setdiff(names(all_info), not_versions)
+  if (length(folders) & !is.list(folders))
+    folders <- structure(rep(folders, length(to_knit)), names = to_knit)
 
   # Write and knit file for each version
 
