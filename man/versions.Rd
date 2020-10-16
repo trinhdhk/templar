@@ -33,10 +33,10 @@ as it is combined with the other version labels to make a solution set.
 
 The version label \code{"none"} is special; it will be ignored in the creation
 of the child documents.  Use it to leave yourself notes in the original document.
+}
+\examples{
 
-Example R Markdown source:
-
-\preformatted{
+\dontrun{
 ---
 title: "Example"
 output: html_document
@@ -47,17 +47,17 @@ knitr::opts_chunk$set(echo = TRUE)
 templar::versions()
 ```
 
-\%\%\%
+\\%\\%\\%
 version: A
 
 You are taking **Exam A**
-\%\%\%
+\\%\\%\\%
 
-\%\%\%
+\\%\\%\\%
 version: B
 
 You are taking **Exam B**
-\%\%\%
+\\%\\%\\%
 
 ## Question 1: Means
 
@@ -75,17 +75,18 @@ set.seed(456)
 a <- rnorm(10)
 ```
 
-\%\%\%
+\\%\\%\\%
 version: A
 
 The mean is `r mean(a)`
-\%\%\%
+\\%\\%\\%
 
-\%\%\%
+\\%\\%\\%
 version: none
 
 Note to self: make a version C later.
-\%\%\%
+\\%\\%\\%
 
 }
+
 }
