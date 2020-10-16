@@ -151,7 +151,7 @@ versions <- function(global_eval = TRUE,
 
   to_knit <- setdiff(names(all_info), not_versions)
   if (length(folders) & !is.list(folders))
-    folders <- structure(rep(folders, length(to_knit)), names = to_knit)
+    folders <- structure(as.list(rep(folders, length(to_knit))), names = to_knit)
 
   # Write and knit file for each version
 
