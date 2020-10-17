@@ -10,7 +10,7 @@
 #'
 #' @return Doesn't return anything, but generates the new RMD files.
 
-write_version <- function(v, orig_name, orig_dir, orig_text, sec_info, all_info, folders, .interactive = identical(Sys.getenv("RSTUDIO"), "1")){
+write_version <- function(v, orig_name, orig_dir, orig_text, sec_info, all_info, folders, ..., .use_jobs = identical(Sys.getenv("RSTUDIO"), "1")){
   options(knitr.duplicate.label = 'allow')
   new_name <- get_new_name(v, orig_name, orig_dir, folders)
 
@@ -18,10 +18,10 @@ write_version <- function(v, orig_name, orig_dir, orig_text, sec_info, all_info,
 
   writeLines(temp, new_name)
 
-  if (.interactive) {
-   .__interactive_knit_jobs__(new_name)
+  if (.use_jobs) {
+   .__interactive_knit_jobs__(new_name, ... )
   } else {
-    rmarkdown::render(new_name, envir = new.env())
+    rmarkdown::render(new_name, envir = new.env(), ...)
   }
-  NULL
+  invisible(TRUE)
 }

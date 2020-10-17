@@ -12,7 +12,8 @@ write_version(
   sec_info,
   all_info,
   folders,
-  .interactive = identical(Sys.getenv("RSTUDIO"), "1")
+  ...,
+  .use_jobs = identical(Sys.getenv("RSTUDIO"), "1")
 )
 }
 \arguments{

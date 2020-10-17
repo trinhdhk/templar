@@ -19,28 +19,38 @@ knit_versions <- function(orig_file,
                           to_knit = NULL,
                           folders = NULL,
                           knit_global = TRUE,
-                          .interactive = identical(Sys.getenv("RSTUDIO"), "1"),
-                          .ncores = floor(parallel::detectCores()/2)){
+                          .use_jobs = identical(Sys.getenv("RSTUDIO"), "1"),
+                          .ncores = ceiling(parallel::detectCores()/2),
+                          ...){
+  if (missing(orig_file))
+    return(purrr::partial(knit_versions,
+                          global_eval = {{global_eval}},
+                          to_knit = {{to_knit}},
+                          folders = {{folders}},
+                          knit_global = {{knit_global}},
+                          .use_jobs = {{.use_jobs}},
+                          .ncores = {{.ncores}},
+                          ...))
   orig_dir  <- dirname(orig_file)
   orig_name <- basename(orig_file)
-
+  # browser()
   orig_text <- readLines(orig_file)
-  has_call <- length(orig_text %>% stringr::str_which("versions\\("))
+  has_call <-
+    length(grep("(?<!_)versions\\(", orig_text, perl = TRUE)) &&
+    !all(grepl("^#", grep("(?<!_)versions\\(", orig_text, value = TRUE, perl = TRUE)))
   orig_text <- prep_orig_text(orig_text, global_eval)
+  # tmpdir <- if (.use_jobs) tempdir() else NULL
 
   if (knit_global){
     if (has_call)
       message("Found ", crayon::green('versions()'), " call within markdown file, pass to `rmarkdown::render`...")
-    if (.interactive){
-      if (has_call) {
-        rmarkdown::render(orig_file, encoding = "UTF-8")
-        return(invisible(TRUE))
-      }
+    if (.use_jobs){
+      .__interactive_knit_jobs__(orig_file, ...)
     } else{
       message("- Knitting global file.")
-      rmarkdown::render(orig_file, encoding = "UTF-8")
-      if (has_call) return(invisible(TRUE))
+      rmarkdown::render(orig_file, ...)
     }
+    if (has_call) return(invisible(TRUE))
   }
 
   # Pull out chunk label info pertaining to versions
@@ -90,17 +100,24 @@ knit_versions <- function(orig_file,
 
   # Write and knit file for each version
 
-  if (.ncores > 1 && !.interactive){
-    fn_map <- furrr::future_map
-    future::plan(future::multiprocess, workers = .ncores)
+  if (.ncores > 1 && !.use_jobs){
+    # fn_map <- furrr::future_map
+    future::plan(future::multisession, workers = .ncores)
     message("- Knitting versioned files.")
-  } else {
-    fn_map <- purrr::map
   }
+  # else {
+    # fn_map <- purrr::map
+  # }
 
-  fn_map(to_knit, write_version,
-         orig_name, orig_dir, orig_text, sec_info, all_info, folders, .interactive)
+  if (.use_jobs) cat(crayon::green("Job created for "))
+  for (tk in to_knit){
+    if (.use_jobs) cat(tk, " ")
+    write_version(tk, orig_name, orig_dir, orig_text, sec_info, all_info, folders, ...,
+                  .use_jobs = .use_jobs)
+  }
+  # fn_map(to_knit, write_version,
+  #        orig_name, orig_dir, orig_text, sec_info, all_info, folders, .use_jobs)
 
-  cat(crayon::green("Finished.\n"))
-  invisible(TRUE)
+  cat("\n")
+  return(invisible(TRUE))
 }

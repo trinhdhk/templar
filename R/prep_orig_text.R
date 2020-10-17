@@ -8,9 +8,8 @@
 #'
 
 prep_orig_text <- function(orig_text, global_eval = TRUE) {
-
   # Remove lines that call templar::versions()
-  start_call <- orig_text %>% stringr::str_which("versions\\(")
+  start_call <- orig_text %>% stringr::str_which("(?<!_)versions\\(")
   if (length(start_call)){
     end_call <- which(orig_text == "" | orig_text == "```")
     end_call <- min(end_call[end_call > start_call]) - 1

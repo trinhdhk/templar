@@ -10,8 +10,9 @@ knit_versions(
   to_knit = NULL,
   folders = NULL,
   knit_global = TRUE,
-  .interactive = identical(Sys.getenv("RSTUDIO"), "1"),
-  .ncores = floor(parallel::detectCores()/2)
+  .use_jobs = identical(Sys.getenv("RSTUDIO"), "1"),
+  .ncores = ceiling(parallel::detectCores()/2),
+  ...
 )
 }
 \arguments{
