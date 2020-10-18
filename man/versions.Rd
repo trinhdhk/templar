@@ -4,7 +4,12 @@
 \alias{versions}
 \title{Knit different versions of a file from chunk and section options}
 \usage{
-versions(global_eval = TRUE, to_knit = NULL, folders = NULL)
+versions(
+  global_eval = TRUE,
+  to_knit = NULL,
+  folders = NULL,
+  solution_with_question = TRUE
+)
 }
 \arguments{
 \item{global_eval}{Logical.}
@@ -12,7 +17,9 @@ versions(global_eval = TRUE, to_knit = NULL, folders = NULL)
 \item{to_knit}{Character vector specifying which versions to write and knit
 into separate files.  If not specified, all versions are produced.}
 
-\item{folders}{List of versions and subfolder to put them in. Use pattern
+\item{folders}{List of versions and subfolder to put them in. Use pattern}
+
+\item{solution_with_question}{Whether to include questions in solutions.
 \code{version_name = folder_name}.  Default is each version in its own folder.}
 }
 \value{
