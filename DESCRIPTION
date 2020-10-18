@@ -27,5 +27,7 @@ Imports:
     purrr,
     magrittr,
     tidyr,
-    here
+    here,
+    rstudioapi,
+    future
 VignetteBuilder: knitr
