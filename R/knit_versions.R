@@ -102,7 +102,7 @@ knit_versions <- function(orig_file,
                           ...){
   if (missing(orig_file)){
     if (!missing(...))
-      warning("Ellipsis arguments are ignored in partial call generator to avoid conflicts with rmarkdown::render.",
+      warning("Ellipsis arguments are ignored in partial call generator to avoid conflicts with rmarkdown::render. ",
               "Please specify those in the evaluated call instead, i.e. when orig_file is present.")
     return(purrr::partial(knit_versions,
                           global_eval = {{global_eval}},
@@ -197,13 +197,13 @@ knit_versions <- function(orig_file,
 
   if (.use_jobs) cat(crayon::green("Job created for "), if (knit_global) "(global) ")
   for (tk in to_knit){
-    if (.use_jobs) cat(tk, " ")
     write_version(tk, orig_name, orig_dir, orig_text, sec_info, all_info, folders, ...,
                   .use_jobs = .use_jobs)
+    if (.use_jobs) cat(tk, " ")
   }
   # fn_map(to_knit, write_version,
   #        orig_name, orig_dir, orig_text, sec_info, all_info, folders, .use_jobs)
-
+  if (.use_jobs) cat(crayon::green(glue::glue("at {Sys.time()}")))
   cat("\n")
   return(invisible(TRUE))
 }
