@@ -7,11 +7,88 @@
 #' @param global_eval Logical.
 #' @param to_knit Character vector specifying which versions to write and knit
 #' into separate files.  If not specified, all versions are produced.
-#' @param folders List of versions and subfolder to put them in. Use pattern
+#' @param folders List of versions and sub-folder to put them in. Use pattern
 #' \code{version_name = folder_name}.  Default is each version in its own folder.
-#' @param knit_global Whether to knit the global file, default to TRUE
+#' @param knit_global Whether to knit the global file, default to TRUE.
+#' @param solution_with_question Whether to include questions in solutions.
+#' @param .use_jobs Default to TRUE. Whether to use RStudio's local jobs for better interactivity.
+#' When "jobs" is used, .ncores will not be respected.
+#' @param .ncores Default to half of the number of cores available passed to \link[future]{multiprocess}.
+#' This is only respected when .use_jobs == FALSE. .ncores == 1, versioned files will be knitted sequentially.
+#' @param ... additional parameters passed to rmarkdown::render.
+#' Note that when orig_file is missing and the partial call is returned, this argument will be ignored to
+#' avoid conflicts with RStudio's Knit button.
 #'
-#' @returns none
+#' @return if orig_file is not missing, will trigger knitting and return TRUE;
+#' otherwise will return a partial call to itself waiting for the file to be supplied.
+#'
+#' @details
+#' This function is meant to be call independently from the Knitting process and/or
+#' replacing the knitting engine by add it to the yaml part of Rmd files.
+#' In the latter case, orig_file will not be presented and a partial call will be returned.
+#' The syntax to specify knit_version as a knit engine in Rmd files is:
+#'
+#' \code{knit: templar::knit_versions(<options, excluding orig_file>)}
+#'
+#' See the example below for more details.
+#'
+#' @seealso \link{versions}, \link[rmarkdown]{render}, \link[knitr]{knit}, \link[future]{mutliprocess}
+#'
+#' @examples
+#'
+#' \dontrun{
+#' ---
+#' title: "Example"
+#' output: html_document
+#' knit: templar::knit_versions(knit_global = FALSE)
+#' ---
+#'
+#' ```{r, include=FALSE}
+#' knitr::opts_chunk$set(echo = TRUE)
+#' ```
+#'
+#' %%%
+#' version: A
+#'
+#' You are taking **Exam A**
+#' %%%
+#'
+#' %%%
+#' version: B
+#'
+#' You are taking **Exam B**
+#' %%%
+#'
+#' ## Question 1: Means
+#'
+#' Find the mean of the vector `a`
+#'
+#' ```{r, version = "A"}
+#' set.seed(123)
+#' ```
+#'
+#' ```{r, version = "B"}
+#' set.seed(456)
+#' ```
+#'
+#' ```{r, version = "A"}
+#' a <- rnorm(10)
+#' ```
+#'
+#' %%%
+#' version: A
+#'
+#' The mean is `r mean(a)`
+#' %%%
+#'
+#' %%%
+#' version: none
+#'
+#' Note to self: make a version C later.
+#' %%%
+#'
+#' }
+#'
 #'
 #' @export
 knit_versions <- function(orig_file,
@@ -19,18 +96,24 @@ knit_versions <- function(orig_file,
                           to_knit = NULL,
                           folders = NULL,
                           knit_global = TRUE,
+                          solution_with_question = TRUE,
                           .use_jobs = identical(Sys.getenv("RSTUDIO"), "1"),
                           .ncores = ceiling(parallel::detectCores()/2),
                           ...){
-  if (missing(orig_file))
+  if (missing(orig_file)){
+    if (!missing(...))
+      warning("Ellipsis arguments are ignored in partial call generator to avoid conflicts with rmarkdown::render.",
+              "Please specify those in the evaluated call instead, i.e. when orig_file is present.")
     return(purrr::partial(knit_versions,
                           global_eval = {{global_eval}},
                           to_knit = {{to_knit}},
                           folders = {{folders}},
                           knit_global = {{knit_global}},
+                          solution_with_question = {{solution_with_question}},
                           .use_jobs = {{.use_jobs}},
-                          .ncores = {{.ncores}},
-                          ...))
+                          .ncores = {{.ncores}}))
+  }
+
   orig_dir  <- dirname(orig_file)
   orig_name <- basename(orig_file)
   # browser()
@@ -45,10 +128,11 @@ knit_versions <- function(orig_file,
     if (has_call)
       message("Found ", crayon::green('versions()'),
               " call within markdown file, pass to ", crayon::green("`rmarkdown::render`"),".\n",
-              ">> To avoid this behaviour, please comment out or delete every ", crayon::green("`templar::versions()`"),
-              " call in the markdown file, or use the built-in Knit button.\n",
-              ">> If you still want to interchangeably switch between 2 methods, please specify ", crayon::green("`templar::knit_version`"), " as a knit method",
-              " by adding this line at the bottom the yaml part. You can safely remove ", crayon::green('versions()'), " calls.\n\n",
+              ">> Knit_version() is not supposed to used with version(),",
+              " if you want to use the former, please comment out or delete every ", crayon::green("`templar::versions()`"),
+              " call in the markdown file, or use the built-in Knit button or", crayon::green("rmarkdown::render()"), ".\n",
+              ">> If you want to use ", crayon::green("`templar::knit_version`"), " as the default knit engine",
+              " please add this line at the bottom the yaml part. You can safely remove ", crayon::green('versions()'), " calls.\n\n",
               crayon::bgYellow(crayon::red("knit: templar::knit_versions()\n")))
     if (.use_jobs){
       .__interactive_knit_jobs__(orig_file, ...)
@@ -94,7 +178,7 @@ knit_versions <- function(orig_file,
 
   to_knit <- stringr::str_subset(to_knit, "solution", negate = TRUE)
 
-  all_info <- purrr::map_df(to_knit, get_solution_chunks, all_info) %>%
+  all_info <- purrr::map_df(to_knit, get_solution_chunks, all_info, solution_with_question) %>%
     dplyr::select(-solution) %>%
     dplyr::group_by(starts, ends) %>%
     dplyr::summarise(dplyr::across(.fns = any, na.rm = TRUE), .groups = "drop")

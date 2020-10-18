@@ -10,6 +10,7 @@ knit_versions(
   to_knit = NULL,
   folders = NULL,
   knit_global = TRUE,
+  solution_with_question = TRUE,
   .use_jobs = identical(Sys.getenv("RSTUDIO"), "1"),
   .ncores = ceiling(parallel::detectCores()/2),
   ...
@@ -23,15 +24,98 @@ knit_versions(
 \item{to_knit}{Character vector specifying which versions to write and knit
 into separate files.  If not specified, all versions are produced.}
 
-\item{folders}{List of versions and subfolder to put them in. Use pattern
+\item{folders}{List of versions and sub-folder to put them in. Use pattern
 \code{version_name = folder_name}.  Default is each version in its own folder.}
 
-\item{knit_global}{Whether to knit the global file, default to TRUE}
+\item{knit_global}{Whether to knit the global file, default to TRUE.}
+
+\item{solution_with_question}{Whether to include questions in solutions.}
+
+\item{.use_jobs}{Default to TRUE. Whether to use RStudio's local jobs for better interactivity.
+When "jobs" is used, .ncores will not be respected.}
+
+\item{.ncores}{Default to half of the number of cores available passed to \link[future]{multiprocess}.
+This is only respected when .use_jobs == FALSE. .ncores == 1, versioned files will be knitted sequentially.}
+
+\item{...}{additional parameters passed to rmarkdown::render.
+Note that when orig_file is missing and the partial call is returned, this argument will be ignored to
+avoid conflicts with RStudio's Knit button.}
 }
 \value{
-none
+if orig_file is not missing, will trigger knitting and return TRUE;
+otherwise will return a partial call to itself waiting for the file to be supplied.
 }
 \description{
 \code{knit_versions} is a function that provides an independent version or \code{versions}
 with extra options to give more authorities to the users.
+}
+\details{
+This function is meant to be call independently from the Knitting process and/or
+replacing the knitting engine by add it to the yaml part of Rmd files.
+In the latter case, orig_file will not be presented and a partial call will be returned.
+The syntax to specify knit_version as a knit engine in Rmd files is:
+
+\code{knit: templar::knit_versions(<options, excluding orig_file>)}
+
+See the example below for more details.
+}
+\examples{
+
+\dontrun{
+---
+title: "Example"
+output: html_document
+knit: templar::knit_versions(knit_global = FALSE)
+---
+
+```{r, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+\%\%\%
+version: A
+
+You are taking **Exam A**
+\%\%\%
+
+\%\%\%
+version: B
+
+You are taking **Exam B**
+\%\%\%
+
+## Question 1: Means
+
+Find the mean of the vector `a`
+
+```{r, version = "A"}
+set.seed(123)
+```
+
+```{r, version = "B"}
+set.seed(456)
+```
+
+```{r, version = "A"}
+a <- rnorm(10)
+```
+
+\%\%\%
+version: A
+
+The mean is `r mean(a)`
+\%\%\%
+
+\%\%\%
+version: none
+
+Note to self: make a version C later.
+\%\%\%
+
+}
+
+
+}
+\seealso{
+\link{versions}, \link[rmarkdown]{render}, \link[knitr]{knit}, \link[future]{mutliprocess}
 }

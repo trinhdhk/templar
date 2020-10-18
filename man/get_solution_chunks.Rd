@@ -4,12 +4,14 @@
 \alias{get_solution_chunks}
 \title{Function to label the solution chunks correctly}
 \usage{
-get_solution_chunks(version_chunk, all_info)
+get_solution_chunks(version_chunk, all_info, solution_with_question)
 }
 \arguments{
 \item{version_chunk}{Chunks to knit in the documents}
 
 \item{all_info}{All the code chunks in the data}
+
+\item{solution_with_question}{Whether to include questions in solutions.}
 }
 \value{
 Returns all the code chunks with the solutions correctly labeled as so
