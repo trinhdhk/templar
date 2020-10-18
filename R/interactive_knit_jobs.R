@@ -28,7 +28,7 @@
   # due to some unknown reasons, RStudio sometimes fails to create jobs if using Knit button.
   # might be due to the parent process was killed before the job was created.
   # A dummy file will be created as a checkpoint.
-  # If this dummy file doesn't exist, function will wait for 1 second and then recheck.
+  # If this dummy file doesn't exist, function will wait for .5 second and then recheck.
   # If dummy is created, the job is supposedly running just fine.
   dummy <- file.path(dirname(file), glue::glue('._{basename(file)}._dummy_'))
 
@@ -44,7 +44,7 @@
     con = temp_script)
   m <- rstudioapi::callFun("runScriptJob", path = temp_script, name = file_name, encoding = "UTF-8",
                       workingDir = dirname(file), exportEnv = parent.frame())
-  while (!file.exists(dummy)) Sys.sleep(1) # This loop only exits if dummy file is created aka the job is running
+  while (!file.exists(dummy)) Sys.sleep(.5) # This loop only exits if dummy file is created aka the job is running
   file.remove(dummy) # Remove this dummy when the jobs is running already.
   m
 }
