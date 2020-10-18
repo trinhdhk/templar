@@ -43,7 +43,13 @@ knit_versions <- function(orig_file,
 
   if (knit_global){
     if (has_call)
-      message("Found ", crayon::green('versions()'), " call within markdown file, pass to `rmarkdown::render`...")
+      message("Found ", crayon::green('versions()'),
+              " call within markdown file, pass to ", crayon::green("`rmarkdown::render`"),".\n",
+              ">> To avoid this behaviour, please comment out or delete every ", crayon::green("`templar::versions()`"),
+              " call in the markdown file, or use the built-in Knit button.\n",
+              ">> If you still want to interchangeably switch between 2 methods, please specify ", crayon::green("`templar::knit_version`"), " as a knit method",
+              " by adding this line at the bottom the yaml part. You can safely remove ", crayon::green('versions()'), " calls.\n\n",
+              crayon::bgYellow(crayon::red("knit: templar::knit_versions()\n")))
     if (.use_jobs){
       .__interactive_knit_jobs__(orig_file, ...)
     } else{
@@ -101,15 +107,11 @@ knit_versions <- function(orig_file,
   # Write and knit file for each version
 
   if (.ncores > 1 && !.use_jobs){
-    # fn_map <- furrr::future_map
     future::plan(future::multisession, workers = .ncores)
     message("- Knitting versioned files.")
   }
-  # else {
-    # fn_map <- purrr::map
-  # }
 
-  if (.use_jobs) cat(crayon::green("Job created for "))
+  if (.use_jobs) cat(crayon::green("Job created for "), if (knit_global) "(global) ")
   for (tk in to_knit){
     if (.use_jobs) cat(tk, " ")
     write_version(tk, orig_name, orig_dir, orig_text, sec_info, all_info, folders, ...,
