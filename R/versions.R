@@ -9,6 +9,7 @@
 #' @param to_knit Character vector specifying which versions to write and knit
 #' into separate files.  If not specified, all versions are produced.
 #' @param folders List of versions and subfolder to put them in. Use pattern
+#' @param solution_with_question Whether to include questions in solutions.
 #' \code{version_name = folder_name}.  Default is each version in its own folder.
 #'
 #' @returns none
@@ -83,7 +84,8 @@
 #' @export
 versions <- function(global_eval = TRUE,
                      to_knit = NULL,
-                     folders = NULL) {
+                     folders = NULL,
+                     solution_with_question = TRUE) {
 
   if (!isTRUE(getOption('knitr.in.progress'))){
     return()
@@ -95,7 +97,9 @@ versions <- function(global_eval = TRUE,
     knitr::opts_chunk$set(eval = TRUE)
   }
   message("Start knitting versioned markdowns.")
-  knit_versions(orig_file = orig_file, global_eval = global_eval, to_knit = to_knit, folders = folders, knit_global = FALSE)
+  knit_versions(orig_file = orig_file, global_eval = global_eval,
+                to_knit = to_knit, folders = folders, knit_global = FALSE,
+                solution_with_question = solution_with_question)
   message("Finish knitting versioned markdowns.")
   knitr::opts_chunk$set(orig_opts)
 }
