@@ -1,6 +1,6 @@
 Package: templar
 Title: Easy templating and autogeneration for course materials and more
-Version: 0.0.0.9000
+Version: 0.0.0.9001
 Authors@R: 
     c(person(given = "Kelly",
            family = "Bodwin",
