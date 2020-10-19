@@ -4,7 +4,7 @@
 #' with extra options to give more authorities to the users.
 #'
 #' @param orig_file The original file serving as the template
-#' @param global_eval Logical.
+#' @param global_eval Logical, default to TRUE. This is to impose eval to global version.
 #' @param to_knit Character vector specifying which versions to write and knit
 #' into separate files.  If not specified, all versions are produced.
 #' @param folders List of versions and sub-folder to put them in. Use pattern
@@ -32,7 +32,7 @@
 #'
 #' See the example below for more details.
 #'
-#' @seealso \link{versions}, \link[rmarkdown]{render}, \link[knitr]{knit}, \link[future]{mutliprocess}
+#' @seealso \link{versions}, \link[rmarkdown]{render}, \link[knitr]{knit}, \link[future]{multiprocess}
 #'
 #' @examples
 #'
