@@ -12,7 +12,7 @@ knit_versions(
   knit_global = TRUE,
   solution_with_question = TRUE,
   .use_jobs = identical(Sys.getenv("RSTUDIO"), "1"),
-  .ncores = ceiling(parallel::detectCores()/2),
+  .ncores = ceiling(future::availableCores()/2),
   ...
 )
 }
