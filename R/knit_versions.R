@@ -14,7 +14,7 @@
 #' @param .use_jobs Default to TRUE. Whether to use RStudio's local jobs for better interactivity.
 #' When "jobs" is used, .ncores will not be respected.
 #' @param .ncores Default to half of the number of cores available passed to \link[future]{multiprocess}.
-#' This is only respected when .use_jobs == FALSE. .ncores == 1, versioned files will be knitted sequentially.
+#' This is only respected when .use_jobs == FALSE. If .ncores == 1, versioned files will be knitted sequentially.
 #' @param ... additional parameters passed to rmarkdown::render.
 #' Note that when orig_file is missing and the partial call is returned, this argument will be ignored to
 #' avoid conflicts with RStudio's Knit button.

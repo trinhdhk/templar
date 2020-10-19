@@ -19,7 +19,7 @@ knit_versions(
 \arguments{
 \item{orig_file}{The original file serving as the template}
 
-\item{global_eval}{Logical.}
+\item{global_eval}{Logical, default to TRUE. This is to impose eval to global version.}
 
 \item{to_knit}{Character vector specifying which versions to write and knit
 into separate files.  If not specified, all versions are produced.}
@@ -35,7 +35,7 @@ into separate files.  If not specified, all versions are produced.}
 When "jobs" is used, .ncores will not be respected.}
 
 \item{.ncores}{Default to half of the number of cores available passed to \link[future]{multiprocess}.
-This is only respected when .use_jobs == FALSE. .ncores == 1, versioned files will be knitted sequentially.}
+This is only respected when .use_jobs == FALSE. If .ncores == 1, versioned files will be knitted sequentially.}
 
 \item{...}{additional parameters passed to rmarkdown::render.
 Note that when orig_file is missing and the partial call is returned, this argument will be ignored to
@@ -117,5 +117,5 @@ Note to self: make a version C later.
 
 }
 \seealso{
-\link{versions}, \link[rmarkdown]{render}, \link[knitr]{knit}, \link[future]{mutliprocess}
+\link{versions}, \link[rmarkdown]{render}, \link[knitr]{knit}, \link[future]{multiprocess}
 }
