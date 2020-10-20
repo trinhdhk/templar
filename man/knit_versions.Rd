@@ -50,9 +50,9 @@ otherwise will return a partial call to itself waiting for the file to be suppli
 with extra options to give more authorities to the users.
 }
 \details{
-This function is meant to be call independently from the Knitting process and/or
-replacing the knitting engine by add it to the yaml part of Rmd files.
-In the latter case, orig_file will not be presented and a partial call will be returned.
+This function is meant (1) to be called independently from the knitting process and/or
+(2) to replace the knitting engine by add it to the yaml part of Rmd files.
+In the latter use case, orig_file will not be presented and a partial call will be returned.
 The syntax to specify knit_version as a knit engine in Rmd files is:
 
 \code{knit: templar::knit_versions(<options, excluding orig_file>)}
