@@ -36,6 +36,7 @@
 
   # Write everything to the script
   writeLines(c(
+    glue::glue("# Creating dummy file ------------"),
     glue::glue("writeLines('DUMMY FILE FOR {file_name}', con = '{dummy}')"), # creation of dummy
     glue::glue("# Rendering {file_name} -------------"),
     glue::glue("rmarkdown::render('{file}'{ell})"),

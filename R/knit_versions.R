@@ -203,7 +203,10 @@ knit_versions <- function(orig_file,
   }
   # fn_map(to_knit, write_version,
   #        orig_name, orig_dir, orig_text, sec_info, all_info, folders, .use_jobs)
-  if (.use_jobs) cat(crayon::green(glue::glue("at {Sys.time()}")))
+  if (.use_jobs) {
+    cat(crayon::green(glue::glue("at {Sys.time()}")), "\n")
+    cat("Please switch to the Jobs tab to see the progress.")
+  }
   cat("\n")
   return(invisible(TRUE))
 }
