@@ -10,8 +10,8 @@ get_version_text <- function(source_text) {
 
   secs <- source_text %>% stringr::str_which("%%%")
   if (length(secs) %% 2) stop("Found odd number of version chunks in markdown code. Please check!")
-  if (length(secs) == 0){
-    return(NULL)
+  if (!length(secs)){
+    return(data.frame(starts = NULL, ends = NULL))
   }
 
   sec_info <- data.frame(

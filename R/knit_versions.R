@@ -162,6 +162,10 @@ knit_versions <- function(orig_file,
 
   not_versions <- c("starts", "ends", "is_versioned", "none")
 
+  # Excluding columns that don't exist
+  not_versions <- not_versions[not_versions %in% names(all_info)]
+  to_knit      <- to_knit[to_knit %in% names(all_info)]
+
   # In case we only want to knit a few of the versions
 
   if (length(to_knit)) {
@@ -172,16 +176,20 @@ knit_versions <- function(orig_file,
 
   # Handles the absence of solution code chunks
 
-  if (is.null(all_info[["solution"]])) {
-    all_info[["solution"]] <- FALSE
+  has_solution <- length(grep("solution", all_info))
+
+  if (has_solution){
+    if (is.null(all_info[["solution"]])) {
+      all_info[["solution"]] <- FALSE
+    }
+
+    to_knit <- stringr::str_subset(to_knit, "solution", negate = TRUE)
+
+    all_info <- purrr::map_df(to_knit, get_solution_chunks, all_info, solution_with_question) %>%
+      dplyr::select(-solution) %>%
+      dplyr::group_by(starts, ends) %>%
+      dplyr::summarise(dplyr::across(.fns = any, na.rm = TRUE), .groups = "drop")
   }
-
-  to_knit <- stringr::str_subset(to_knit, "solution", negate = TRUE)
-
-  all_info <- purrr::map_df(to_knit, get_solution_chunks, all_info, solution_with_question) %>%
-    dplyr::select(-solution) %>%
-    dplyr::group_by(starts, ends) %>%
-    dplyr::summarise(dplyr::across(.fns = any, na.rm = TRUE), .groups = "drop")
 
   to_knit <- setdiff(names(all_info), not_versions)
 
