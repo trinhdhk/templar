@@ -19,7 +19,7 @@
 #' @param file Rmd file to knit
 #' @param ... additional parameters passed to rmarkdown::render
 #' @return A string containing job's ID.
-.__interactive_knit_jobs__ <- function(file, ...){
+.__interactive_knit_jobs__ <- function(file, output_format, ...){
   # set the link to the knitter file.
   # the script file is placed within the sub-folder of each version.
   temp_script <- file.path(dirname(file), glue::glue('._{basename(file)}._knitter_.R'))
@@ -38,8 +38,9 @@
   writeLines(c(
     glue::glue("# Creating dummy file ------------"),
     glue::glue("writeLines('DUMMY FILE FOR {file_name}', con = '{dummy}')"), # creation of dummy
+    "library(rmarkdown)",
     glue::glue("# Rendering {file_name} -------------"),
-    glue::glue("rmarkdown::render('{file}'{ell})"),
+    glue::glue("rmarkdown::render('{file}', output_format = {output_format} {ell})"),
     "# Cleaning up -----------",
     glue::glue("file.remove('{temp_script}')")),
     con = temp_script)

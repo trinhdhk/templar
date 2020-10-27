@@ -11,6 +11,9 @@
 #' \code{version_name = folder_name}.  Default is each version in its own folder.
 #' @param knit_global Whether to knit the global file, default to TRUE.
 #' @param solution_with_question Whether to include questions in solutions.
+#' @param output_formats default to NULL. Overriding the Output options on the YAML header;
+#' can be a function passed to rmarkdown::render or a named list whose elements are the former and names are
+#' versions.
 #' @param .use_jobs Default to TRUE. Whether to use RStudio's local jobs for better interactivity.
 #' When "jobs" is used, .ncores will not be respected.
 #' @param .ncores Default to half of the number of cores available passed to \link[future]{multiprocess}.
@@ -97,6 +100,7 @@ knit_versions <- function(orig_file,
                           folders = NULL,
                           knit_global = TRUE,
                           solution_with_question = TRUE,
+                          output_formats = NULL,
                           .use_jobs = identical(Sys.getenv("RSTUDIO"), "1"),
                           .ncores = ceiling(future::availableCores()/2),
                           ...){
@@ -110,6 +114,7 @@ knit_versions <- function(orig_file,
                           folders = {{folders}},
                           knit_global = {{knit_global}},
                           solution_with_question = {{solution_with_question}},
+                          output_formats = {{output_formats}},
                           .use_jobs = {{.use_jobs}},
                           .ncores = {{.ncores}}))
   }
@@ -196,6 +201,9 @@ knit_versions <- function(orig_file,
   if (length(folders) && !is.list(folders))
     folders <- structure(as.list(rep(folders, length(to_knit))), names = to_knit)
 
+  if (length(output_formats) && !is.list(output_formats))
+    output_formats <- structure(as.list(rep(output_formats, length(to_knit))), names = to_knit)
+
   # Write and knit file for each version
 
   if (.ncores > 1 && !.use_jobs){
@@ -205,7 +213,7 @@ knit_versions <- function(orig_file,
 
   if (.use_jobs) cat(crayon::green("Job created for "), if (knit_global) "(global) ")
   for (tk in to_knit){
-    write_version(tk, orig_name, orig_dir, orig_text, sec_info, all_info, folders, ...,
+    write_version(tk, orig_name, orig_dir, orig_text, sec_info, all_info, folders, output_formats, ...,
                   .use_jobs = .use_jobs)
     if (.use_jobs) cat(tk, " ")
   }
