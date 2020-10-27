@@ -11,6 +11,7 @@ knit_versions(
   folders = NULL,
   knit_global = TRUE,
   solution_with_question = TRUE,
+  output_formats = NULL,
   .use_jobs = identical(Sys.getenv("RSTUDIO"), "1"),
   .ncores = ceiling(future::availableCores()/2),
   ...
@@ -30,6 +31,10 @@ into separate files.  If not specified, all versions are produced.}
 \item{knit_global}{Whether to knit the global file, default to TRUE.}
 
 \item{solution_with_question}{Whether to include questions in solutions.}
+
+\item{output_formats}{default to NULL. Overriding the Output options on the YAML header;
+can be a function passed to rmarkdown::render or a named list whose elements are the former and names are
+versions.}
 
 \item{.use_jobs}{Default to TRUE. Whether to use RStudio's local jobs for better interactivity.
 When "jobs" is used, .ncores will not be respected.}

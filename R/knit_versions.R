@@ -206,23 +206,30 @@ knit_versions <- function(orig_file,
 
   # Write and knit file for each version
 
-  if (.ncores > 1 && !.use_jobs){
-    future::plan(future::multisession, workers = .ncores)
-    message("- Knitting versioned files.")
-  }
-
-  if (.use_jobs) cat(crayon::green("Job created for "), if (knit_global) "(global) ")
-  for (tk in to_knit){
-    write_version(tk, orig_name, orig_dir, orig_text, sec_info, all_info, folders, output_formats, ...,
-                  .use_jobs = .use_jobs)
-    if (.use_jobs) cat(tk, " ")
-  }
-  # fn_map(to_knit, write_version,
-  #        orig_name, orig_dir, orig_text, sec_info, all_info, folders, .use_jobs)
   if (.use_jobs) {
+    for (tk in to_knit){
+      cat(crayon::green("Job created for "), if (knit_global) "(global) ")
+      write_version(tk, orig_name, orig_dir, orig_text, sec_info, all_info, folders, output_formats, ...,
+                    .use_jobs = .use_jobs)
+      cat(tk, " ")
+    }
     cat(crayon::green(glue::glue("at {Sys.time()}")), "\n")
     cat("Please switch to the Jobs tab to see the progress.")
+  } else {
+    if (.ncores > 1) future::plan(future::multisession, workers = .ncores)
+    message("- Knitting versioned files.")
+    furrr::future_map(to_knit, write_version,
+                      orig_name, orig_dir, orig_text, sec_info, all_info, folders, output_formats, ..., .use_jobs = .use_jobs)
+    # for (tk in to_knit){
+    #
+    #   ft <- future::future(write_version(tk, orig_name, orig_dir, orig_text, sec_info, all_info, folders, output_formats, ...,
+    #                                .use_jobs = .use_jobs))
+    # }
+    # if (.ncores > 1) future::values(ft)
   }
+
+  # fn_map(to_knit, write_version,
+  #        orig_name, orig_dir, orig_text, sec_info, all_info, folders, .use_jobs)
   cat("\n")
   return(invisible(TRUE))
 }
